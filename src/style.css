@@ -1,0 +1,49 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --cell-size: 30px;
+}
+
+.board {
+    border: 1px solid black;
+    width: fit-content;
+    display: grid;
+    grid-template-columns: repeat(10, var(--cell-size));
+    grid-template-rows: repeat(10, var(--cell-size));
+}
+
+.cell {
+    background-color: initial;
+    border: 1px solid black;
+    width: var(--cell-size);
+    height: var(--cell-size);
+}
+
+.cell.ship {
+    background-color: black;
+    border: 1px solid white;
+}
+
+.ships-container.vertical div.ship {
+    flex-direction: column;
+}
+
+div.ship .cell {
+    background-color: black;
+    border: 1px solid white;
+
+}
+
+div.ship {
+    display: flex;
+    width: fit-content;
+}
+
+div.ship.selected {
+    border: 2px solid #00ff00;
+    transform: scale(1.05);
+}
