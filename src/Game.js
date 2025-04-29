@@ -1,17 +1,22 @@
 import GameBoard from "./GameBoard";
 import Ship from "./Ship";
-import UI from "./UI";
+import BoardUI from "./BoardUI";
+import ui from "./ui";
+
 
 export default class Game {
+    static SHIPS = [
+        new Ship("Destroyer", 2),
+        new Ship("Submarine", 3),
+        new Ship("Cruiser", 3),
+        new Ship("Battleship", 4),
+        new Ship("Carrier", 5),
+    ];
+
     constructor() {
-        this.gameBoard = new GameBoard();
-        this.ships = [
-            new Ship("Destroyer", 2),
-            new Ship("Submarine", 3),
-            new Ship("Cruiser", 3),
-            new Ship("Battleship", 4),
-            new Ship("Carrier", 5),
-        ];
+        this.playerBoard = new GameBoard();
+        this.playerBoardUI = new BoardUI();
+        this.ships = [...Game.SHIPS];
         this.selectedShip = null;
         this.orientation = GameBoard.HORIZONTAL_ORIENTATION;
         this.init();
@@ -19,15 +24,19 @@ export default class Game {
     }
 
     init() {
-        const boardContainer = document.querySelector(".human-board");
+        const playerBoardEl = document.querySelector(".player-board");
+        const computerBoardEl = document.querySelector(".computer-board");
         const shipsContainer = document.querySelector(".ships-container");
 
-        boardContainer.appendChild(UI.createBoard(this.gameBoard.board));
-        shipsContainer.appendChild(UI.createShips(this.ships));
+        this.playerBoardUI.board.forEach((row) => {
+            row.forEach((cell) => {
+                playerBoardEl.appendChild(cell);
+            });
+        });
     }
 
     addEventListeners() {
-        const boardContainer = document.querySelector(".human-board");
+        const boardContainer = document.querySelector(".player-board");
         const shipsContainer = document.querySelector(".ships-container");
         const rotateBtn = document.getElementById("rotate");
 
@@ -43,7 +52,7 @@ export default class Game {
         const yCoord = parseInt(e.target.dataset.column, 10);
 
         if (
-            this.gameBoard.placeShip(
+            this.playerBoard.placeShip(
                 xCoord,
                 yCoord,
                 this.selectedShip,
@@ -53,10 +62,21 @@ export default class Game {
             this.ships = this.ships.filter(
                 (ship) => ship !== this.selectedShip,
             );
+            
+            this.playerBoardUI.markAsShip(
+                GameBoard.getShipIndices(
+                    xCoord,
+                    yCoord,
+                    this.selectedShip,
+                    this.orientation,
+                ),
+            );
+            ui.removeShip(this.selectedShip.name);
             this.selectedShip = null;
 
-            this.renderBoard();
-            this.renderShips();
+
+
+
         }
     };
 
@@ -65,7 +85,7 @@ export default class Game {
 
         boardContainer.innerHTML = "";
 
-        boardContainer.appendChild(UI.createBoard(this.gameBoard.board));
+        boardContainer.appendChild(UI.createBoard(this.player.gameBoard.board));
     }
 
     renderShips() {
@@ -82,10 +102,10 @@ export default class Game {
         const ship = e.target.closest(".ship");
         if (!ship) return;
 
-        const name = ship.dataset.name;
-
+        const name = ship.dataset.shipId;
         this.selectedShip = this.ships.find((ship) => ship.name === name);
-        this.renderShips();
+
+        ui.selectShip(name);
     };
 
     handleRotate = (e) => {
@@ -100,5 +120,5 @@ export default class Game {
         } else {
             this.orientation = GameBoard.VERTICAL_ORIENTATION;
         }
-    }
+    };
 }
