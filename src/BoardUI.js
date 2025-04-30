@@ -1,6 +1,7 @@
 export default class BoardUI {
     constructor() {
         this.board = this.createBoard();
+        this.lastHighlightedCells = [];
     }
 
     // createCell(row, column, className = "") {
@@ -19,10 +20,10 @@ export default class BoardUI {
     //     }
     //     cell.dataset.row = row;
     //     cell.dataset.column = column;
-    
+
     //     return cell;
     // }
-    
+
     createBoard() {
         const board = [];
         for (let i = 0; i < 10; i++) {
@@ -36,15 +37,43 @@ export default class BoardUI {
             }
             board.push(row);
         }
-    
+
         return board;
     }
 
     markAsShip(cells) {
         for (const cell of cells) {
-            this.board[cell[0]][cell[1]].classList.add("ship");
+            const [x, y] = cell;
+            this.board[x][y].classList.add("ship");
         }
     }
+
+    unhighlightCells() {
+        for (const cell of this.lastHighlightedCells) {
+            cell.classList.remove("highlighted");
+        }
+    }
+
+
+    highlightCells(cells) {
+        this.unhighlightCells();
+        for (const cell of cells) {
+            const [x, y] = cell;
+            this.lastHighlightedCells.push(this.board[x][y]);
+            this.board[x][y].classList.add("highlighted");
+        }
+    }
+
+    resetUnavailableCell(x, y) {
+        this.board[x][y].classList.remove("unavailable")
+    }
+
+    markAsUnavailable(x, y) {
+        this.board[x][y].classList.add("unavailable")
+        this.lastUnavailableCell = this.board[x][y];
+    }
+
+
 
     // createShips(ships, selectedShip = null) {
     //     const shipsContainer = document.createElement("div");

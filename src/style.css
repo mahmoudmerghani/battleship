@@ -39,6 +39,14 @@
     border: 1px solid white;
 }
 
+.cell.highlighted {
+    background-color: green;
+}
+
+.cell.unavailable {
+    cursor: not-allowed;
+}
+
 .ships-container.vertical div.ship {
     flex-direction: column;
 }

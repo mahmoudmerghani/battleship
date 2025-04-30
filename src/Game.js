@@ -3,7 +3,6 @@ import Ship from "./Ship";
 import BoardUI from "./BoardUI";
 import ui from "./ui";
 
-
 export default class Game {
     static SHIPS = [
         new Ship("Destroyer", 2),
@@ -43,6 +42,10 @@ export default class Game {
         boardContainer.addEventListener("click", this.handlePlaceShip);
         shipsContainer.addEventListener("click", this.handleSelectShip);
         rotateBtn.addEventListener("click", this.handleRotate);
+        boardContainer.addEventListener("mouseover", this.handleHover);
+        boardContainer.addEventListener("mouseleave", () => {
+            this.playerBoardUI.unhighlightCells();
+        });
     }
 
     handlePlaceShip = (e) => {
@@ -62,7 +65,7 @@ export default class Game {
             this.ships = this.ships.filter(
                 (ship) => ship !== this.selectedShip,
             );
-            
+
             this.playerBoardUI.markAsShip(
                 GameBoard.getShipIndices(
                     xCoord,
@@ -71,32 +74,29 @@ export default class Game {
                     this.orientation,
                 ),
             );
+            this.playerBoardUI.unhighlightCells();
             ui.removeShip(this.selectedShip.name);
             this.selectedShip = null;
-
-
-
-
         }
     };
 
-    renderBoard() {
-        const boardContainer = document.querySelector(".human-board");
+    // renderBoard() {
+    //     const boardContainer = document.querySelector(".human-board");
 
-        boardContainer.innerHTML = "";
+    //     boardContainer.innerHTML = "";
 
-        boardContainer.appendChild(UI.createBoard(this.player.gameBoard.board));
-    }
+    //     boardContainer.appendChild(UI.createBoard(this.player.gameBoard.board));
+    // }
 
-    renderShips() {
-        const shipsContainer = document.querySelector(".ships-container");
+    // renderShips() {
+    //     const shipsContainer = document.querySelector(".ships-container");
 
-        shipsContainer.innerHTML = "";
+    //     shipsContainer.innerHTML = "";
 
-        shipsContainer.appendChild(
-            UI.createShips(this.ships, this.selectedShip),
-        );
-    }
+    //     shipsContainer.appendChild(
+    //         UI.createShips(this.ships, this.selectedShip),
+    //     );
+    // }
 
     handleSelectShip = (e) => {
         const ship = e.target.closest(".ship");
@@ -119,6 +119,35 @@ export default class Game {
             this.orientation = GameBoard.HORIZONTAL_ORIENTATION;
         } else {
             this.orientation = GameBoard.VERTICAL_ORIENTATION;
+        }
+    };
+
+    handleHover = (e) => {
+        if (!e.target.classList.contains("cell") || !this.selectedShip) return;
+
+        const xCoord = parseInt(e.target.dataset.row, 10);
+        const yCoord = parseInt(e.target.dataset.column, 10);
+
+        if (
+            this.playerBoard.isSpaceAvailable(
+                xCoord,
+                yCoord,
+                this.selectedShip,
+                this.orientation,
+            )
+        ) {
+            this.playerBoardUI.highlightCells(
+                GameBoard.getShipIndices(
+                    xCoord,
+                    yCoord,
+                    this.selectedShip,
+                    this.orientation,
+                ),
+            );
+            this.playerBoardUI.resetUnavailableCell(xCoord, yCoord);
+        } else {
+            this.playerBoardUI.unhighlightCells();
+            this.playerBoardUI.markAsUnavailable(xCoord, yCoord);
         }
     };
 }
