@@ -4,20 +4,23 @@ import BoardUI from "./BoardUI";
 import ui from "./ui";
 
 export default class Game {
-    static SHIPS = [
-        new Ship("Destroyer", 2),
-        new Ship("Submarine", 3),
-        new Ship("Cruiser", 3),
-        new Ship("Battleship", 4),
-        new Ship("Carrier", 5),
-    ];
+    static createShips() {
+        return [
+            new Ship("Destroyer", 2),
+            new Ship("Submarine", 3),
+            new Ship("Cruiser", 3),
+            new Ship("Battleship", 4),
+            new Ship("Carrier", 5),
+        ];
+    }
+    
 
     constructor() {
         this.playerBoard = new GameBoard();
         this.playerBoardUI = new BoardUI();
         this.computerBoard = new GameBoard();
         this.computerBoardUI = new BoardUI();
-        this.ships = [...Game.SHIPS];
+        this.ships = Game.createShips();
         this.selectedShip = null;
         this.orientation = GameBoard.HORIZONTAL_ORIENTATION;
         this.init();
@@ -44,7 +47,7 @@ export default class Game {
             });
         });
 
-        this.computerBoard.placeShipsRandomly([...Game.SHIPS]);
+        this.computerBoard.placeShipsRandomly(Game.createShips());
     }
 
     addEventListeners() {

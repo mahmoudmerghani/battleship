@@ -6,26 +6,6 @@ export default class BoardUI {
         this.lastHighlightedCells = [];
     }
 
-    // createCell(row, column, className = "") {
-    //     const cell = document.createElement("button");
-    //     cell.classList.add("cell");
-    //     if (className) {
-    //         cell.classList.add(className);
-    //         switch (className) {
-    //             case "hit":
-    //                 cell.textContent = "X";
-    //                 break;
-    //             case "miss":
-    //                 cell.textContent = "○";
-    //                 break;
-    //         }
-    //     }
-    //     cell.dataset.row = row;
-    //     cell.dataset.column = column;
-
-    //     return cell;
-    // }
-
     createBoard() {
         const board = [];
         for (let i = 0; i < 10; i++) {

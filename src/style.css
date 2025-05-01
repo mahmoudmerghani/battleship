@@ -36,6 +36,7 @@
     border: 1px solid black;
     width: var(--cell-size);
     height: var(--cell-size);
+    cursor: pointer;
 }
 
 .cell.ship {
@@ -43,7 +44,7 @@
     border: 1px solid white;
 }
 
-.cell.highlighted {
+.cell.highlighted, .cell:hover {
     background-color: green;
 }
 
