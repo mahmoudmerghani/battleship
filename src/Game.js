@@ -184,8 +184,14 @@ export default class Game {
             result === GameBoard.attackResult.MISS
         ) {
             this.computerBoardUI.updateCell(x, y, result);
-            this.attackPlayer();
             this.computerBoardUI.markAsUnavailable(x, y);
+
+            if (this.computerBoard.allShipsSunk()) {
+                alert("Player won!");
+            }
+            else {
+                this.attackPlayer();
+            }
         }
     };
 
@@ -193,5 +199,9 @@ export default class Game {
         const { result, x, y } = this.playerBoard.receiveRandomAttack();
 
         this.playerBoardUI.updateCell(x, y, result);
+
+        if (this.playerBoard.allShipsSunk()) {
+            alert("Computer won!");
+        }
     }
 }
