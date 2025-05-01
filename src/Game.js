@@ -173,21 +173,25 @@ export default class Game {
 
     handlePlayerAttack = (e) => {
         if (!e.target.classList.contains("cell")) return;
-    
+
         const x = parseInt(e.target.dataset.row, 10);
         const y = parseInt(e.target.dataset.column, 10);
-    
+
         const result = this.computerBoard.receiveAttack(x, y);
-    
-        switch (result) {
-            case GameBoard.attackResult.HIT:
-                e.target.classList.add("hit");
-                break;
-            case GameBoard.attackResult.MISS:
-                e.target.classList.add("miss");
-                // maybe show splash animation
-                break;
+
+        if (
+            result === GameBoard.attackResult.HIT ||
+            result === GameBoard.attackResult.MISS
+        ) {
+            this.computerBoardUI.updateCell(x, y, result);
+            this.attackPlayer();
+            this.computerBoardUI.markAsUnavailable(x, y);
         }
+    };
+
+    attackPlayer() {
+        const { result, x, y } = this.playerBoard.receiveRandomAttack();
+
+        this.playerBoardUI.updateCell(x, y, result);
     }
-    
 }

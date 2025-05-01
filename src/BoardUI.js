@@ -1,3 +1,5 @@
+import GameBoard from "./GameBoard";
+
 export default class BoardUI {
     constructor() {
         this.board = this.createBoard();
@@ -73,37 +75,15 @@ export default class BoardUI {
         this.lastUnavailableCell = this.board[x][y];
     }
 
-
-
-    // createShips(ships, selectedShip = null) {
-    //     const shipsContainer = document.createElement("div");
-    //     shipsContainer.classList.add("ships");
-
-    //     for (const ship of ships) {
-    //         const container = document.createElement("div");
-    //         const shipCellsContainer = document.createElement("div");
-    //         shipCellsContainer.classList.add("ship");
-    //         shipCellsContainer.dataset.name = ship.name;
-    //         if (ship === selectedShip) {
-    //             shipCellsContainer.classList.add("selected");
-    //         }
-
-    //         for (let i = 0; i < ship.length; i++) {
-    //             const cell = document.createElement("button");
-    //             cell.classList.add("cell");
-
-    //             shipCellsContainer.appendChild(cell);
-    //         }
-
-    //         const name = document.createElement("h3");
-    //         name.textContent = ship.name;
-
-    //         container.appendChild(shipCellsContainer);
-    //         container.appendChild(name);
-
-    //         shipsContainer.appendChild(container);
-    //     }
-
-    //     return shipsContainer;
-    // }
+    updateCell(x, y, action) {
+        const cell = this.board[x][y];
+        switch (action) {
+            case GameBoard.attackResult.HIT:
+                cell.classList.add("hit");
+                break;
+            case GameBoard.attackResult.MISS:
+                cell.classList.add("miss");
+                break;
+        }
+    }
 }

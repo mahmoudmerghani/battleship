@@ -127,6 +127,18 @@ export default class GameBoard {
         return cells;
     }
 
+    receiveRandomAttack() {
+        while (true) {
+            const x = Math.floor(Math.random() * 10);
+            const y = Math.floor(Math.random() * 10);
+            const result = this.receiveAttack(x, y);
+
+            if (result === GameBoard.attackResult.HIT || result === GameBoard.attackResult.MISS) {
+                return { result, x, y };
+            }
+        }
+    }
+
     allShipsSunk() {
         return [...this.ships].every((ship) => ship.isSunk());
     }
