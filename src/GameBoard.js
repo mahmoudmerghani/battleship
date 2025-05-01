@@ -4,6 +4,12 @@ export default class GameBoard {
     static SIZE = 10;
     static HORIZONTAL_ORIENTATION = "h";
     static VERTICAL_ORIENTATION = "v";
+    static attackResult = {
+        HIT: "hit",
+        MISS: "miss",
+        ALREADY_HIT: "already-hit",
+        OUT_OF_BOUNDS: "out-of-bounds"
+    };
 
     constructor() {
         this.board = this.createBoard();
@@ -45,16 +51,20 @@ export default class GameBoard {
     }
 
     receiveAttack(x, y) {
-        if (this.isOutOfBounds(x, y)) return false;
+        if (this.isOutOfBounds(x, y)) return GameBoard.attackResult.OUT_OF_BOUNDS;
 
-        if (this.getCell(x, y).hit) return false;
+        const cell = this.getCell(x, y);
 
-        if (this.getCell(x, y).ship !== null) {
-            this.getCell(x, y).ship.hit();
+        if (cell.hit) return GameBoard.attackResult.ALREADY_HIT;
+
+        cell.hit = true;
+
+        if (cell.ship !== null) {
+            cell.ship.hit();
+            return GameBoard.attackResult.HIT;
         }
-        this.getCell(x, y).hit = true;
 
-        return true;
+        return GameBoard.attackResult.MISS;
     }
 
     isOutOfBounds(x, y) {
@@ -94,6 +104,7 @@ export default class GameBoard {
     }
 
     placeShipsRandomly(ships) {
+        const cells = [];
         for (const ship of ships) {
             while (true) {
                 const x = Math.floor(Math.random() * 10);
@@ -106,9 +117,14 @@ export default class GameBoard {
                     orientation = GameBoard.VERTICAL_ORIENTATION;
                 }
 
-                if (this.placeShip(x, y, ship, orientation)) break;
+                if (this.placeShip(x, y, ship, orientation)) {
+                    cells.push(GameBoard.getShipIndices(x, y, ship, orientation));
+                    break;
+                }
             }
         }
+
+        return cells;
     }
 
     allShipsSunk() {

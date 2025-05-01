@@ -15,6 +15,8 @@ export default class Game {
     constructor() {
         this.playerBoard = new GameBoard();
         this.playerBoardUI = new BoardUI();
+        this.computerBoard = new GameBoard();
+        this.computerBoardUI = new BoardUI();
         this.ships = [...Game.SHIPS];
         this.selectedShip = null;
         this.orientation = GameBoard.HORIZONTAL_ORIENTATION;
@@ -24,8 +26,6 @@ export default class Game {
 
     init() {
         const playerBoardEl = document.querySelector(".player-board");
-        const computerBoardEl = document.querySelector(".computer-board");
-        const shipsContainer = document.querySelector(".ships-container");
 
         this.playerBoardUI.board.forEach((row) => {
             row.forEach((cell) => {
@@ -34,18 +34,38 @@ export default class Game {
         });
     }
 
+    setUpComputerBoard() {
+        const computerBoardEl = document.querySelector(".computer-board");
+        computerBoardEl.style.display = "grid";
+
+        this.computerBoardUI.board.forEach((row) => {
+            row.forEach((cell) => {
+                computerBoardEl.appendChild(cell);
+            });
+        });
+
+        this.computerBoard.placeShipsRandomly([...Game.SHIPS]);
+    }
+
     addEventListeners() {
-        const boardContainer = document.querySelector(".player-board");
+        const playerBoard = document.querySelector(".player-board");
+        const computerBoard = document.querySelector(".computer-board");
         const shipsContainer = document.querySelector(".ships-container");
         const rotateBtn = document.getElementById("rotate");
+        const placeShipsRandomlyBtn = document.getElementById("random");
 
-        boardContainer.addEventListener("click", this.handlePlaceShip);
+        playerBoard.addEventListener("click", this.handlePlaceShip);
         shipsContainer.addEventListener("click", this.handleSelectShip);
         rotateBtn.addEventListener("click", this.handleRotate);
-        boardContainer.addEventListener("mouseover", this.handleHover);
-        boardContainer.addEventListener("mouseleave", () => {
+        playerBoard.addEventListener("mouseover", this.handleHover);
+        playerBoard.addEventListener("mouseleave", () => {
             this.playerBoardUI.unhighlightCells();
         });
+        placeShipsRandomlyBtn.addEventListener(
+            "click",
+            this.handlePlaceShipsRandomly,
+        );
+        computerBoard.addEventListener("click", this.handlePlayerAttack);
     }
 
     handlePlaceShip = (e) => {
@@ -77,26 +97,12 @@ export default class Game {
             this.playerBoardUI.unhighlightCells();
             ui.removeShip(this.selectedShip.name);
             this.selectedShip = null;
+
+            if (this.ships.length === 0) {
+                this.setUpComputerBoard();
+            }
         }
     };
-
-    // renderBoard() {
-    //     const boardContainer = document.querySelector(".human-board");
-
-    //     boardContainer.innerHTML = "";
-
-    //     boardContainer.appendChild(UI.createBoard(this.player.gameBoard.board));
-    // }
-
-    // renderShips() {
-    //     const shipsContainer = document.querySelector(".ships-container");
-
-    //     shipsContainer.innerHTML = "";
-
-    //     shipsContainer.appendChild(
-    //         UI.createShips(this.ships, this.selectedShip),
-    //     );
-    // }
 
     handleSelectShip = (e) => {
         const ship = e.target.closest(".ship");
@@ -109,6 +115,8 @@ export default class Game {
     };
 
     handleRotate = (e) => {
+        if (this.ships.length === 0) return;
+
         const shipsContainer = document.querySelector(".ships-container");
 
         shipsContainer.classList.toggle("vertical");
@@ -150,4 +158,36 @@ export default class Game {
             this.playerBoardUI.markAsUnavailable(xCoord, yCoord);
         }
     };
+
+    handlePlaceShipsRandomly = (e) => {
+        if (this.ships.length === 0) return;
+
+        const cells = this.playerBoard.placeShipsRandomly(this.ships);
+        this.ships = [];
+        ui.removeAllShips();
+
+        cells.forEach((cellArr) => this.playerBoardUI.markAsShip(cellArr));
+
+        this.setUpComputerBoard();
+    };
+
+    handlePlayerAttack = (e) => {
+        if (!e.target.classList.contains("cell")) return;
+    
+        const x = parseInt(e.target.dataset.row, 10);
+        const y = parseInt(e.target.dataset.column, 10);
+    
+        const result = this.computerBoard.receiveAttack(x, y);
+    
+        switch (result) {
+            case GameBoard.attackResult.HIT:
+                e.target.classList.add("hit");
+                break;
+            case GameBoard.attackResult.MISS:
+                e.target.classList.add("miss");
+                // maybe show splash animation
+                break;
+        }
+    }
+    
 }

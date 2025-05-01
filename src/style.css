@@ -27,6 +27,10 @@
     grid-template-rows: repeat(10, var(--cell-size));
 }
 
+.computer-board {
+    display: none;
+}
+
 .cell {
     background-color: initial;
     border: 1px solid black;
@@ -45,6 +49,14 @@
 
 .cell.unavailable {
     cursor: not-allowed;
+}
+
+.cell.hit {
+    background-color: red;
+}
+
+.cell.miss {
+    background-color: grey;
 }
 
 .ships-container.vertical div.ship {

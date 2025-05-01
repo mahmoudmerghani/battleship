@@ -5,6 +5,13 @@ function removeShip(shipId) {
     ship.remove();
 }
 
+function removeAllShips() {
+    const shipsContainer = document.querySelector(".ships-container");
+    const ships = shipsContainer.querySelectorAll(`[data-ship-id]`);
+
+    ships.forEach((ship) => ship.remove());
+}
+
 function selectShip(shipId) {
     const shipsContainer = document.querySelector(".ships-container");
     const ships = shipsContainer.querySelectorAll(`[data-ship-id]`);
@@ -19,4 +26,4 @@ function selectShip(shipId) {
     });
 }
 
-export default { removeShip, selectShip };
+export default { removeShip, removeAllShips, selectShip };
