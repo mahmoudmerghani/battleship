@@ -13,21 +13,24 @@ export default class Game {
             new Ship("Carrier", 5),
         ];
     }
-    
 
     constructor() {
+        this.initializeGameState();
+        this.initializeUI();
+        this.addEventListeners();
+    }
+
+    initializeGameState() {
         this.playerBoard = new GameBoard();
-        this.playerBoardUI = new BoardUI();
         this.computerBoard = new GameBoard();
+        this.playerBoardUI = new BoardUI();
         this.computerBoardUI = new BoardUI();
         this.ships = Game.createShips();
         this.selectedShip = null;
         this.orientation = GameBoard.HORIZONTAL_ORIENTATION;
-        this.init();
-        this.addEventListeners();
     }
 
-    init() {
+    initializeUI() {
         const playerBoardEl = document.querySelector(".player-board");
         const shipsContainer = document.querySelector(".ships-container");
         const shipsElements = ui.createShips(this.ships);
@@ -60,6 +63,7 @@ export default class Game {
         const shipsContainer = document.querySelector(".ships-container");
         const rotateBtn = document.getElementById("rotate");
         const placeShipsRandomlyBtn = document.getElementById("random");
+        const resetBtn = document.getElementById("reset");
 
         playerBoard.addEventListener("click", this.handlePlaceShip);
         shipsContainer.addEventListener("click", this.handleSelectShip);
@@ -73,6 +77,7 @@ export default class Game {
             this.handlePlaceShipsRandomly,
         );
         computerBoard.addEventListener("click", this.handlePlayerAttack);
+        resetBtn.addEventListener("click", this.handleReset);
     }
 
     handlePlaceShip = (e) => {
@@ -195,11 +200,26 @@ export default class Game {
 
             if (this.computerBoard.allShipsSunk()) {
                 alert("Player won!");
-            }
-            else {
+            } else {
                 this.attackPlayer();
             }
         }
+    };
+
+    handleReset = (e) => {
+        const playerBoard = document.querySelector(".player-board");
+        const computerBoard = document.querySelector(".computer-board");
+        const shipsContainer = document.querySelector(".ships-container");
+
+        playerBoard.innerHTML = "";
+        computerBoard.innerHTML = "";
+        shipsContainer.innerHTML = "";
+
+        computerBoard.style.display = "none";
+        shipsContainer.classList.remove("vertical"); 
+
+        this.initializeGameState();
+        this.initializeUI();
     };
 
     attackPlayer() {
