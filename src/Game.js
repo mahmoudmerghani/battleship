@@ -29,12 +29,16 @@ export default class Game {
 
     init() {
         const playerBoardEl = document.querySelector(".player-board");
+        const shipsContainer = document.querySelector(".ships-container");
+        const shipsElements = ui.createShips(this.ships);
 
         this.playerBoardUI.board.forEach((row) => {
             row.forEach((cell) => {
                 playerBoardEl.appendChild(cell);
             });
         });
+
+        shipsElements.forEach((el) => shipsContainer.appendChild(el));
     }
 
     setUpComputerBoard() {
