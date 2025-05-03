@@ -82,6 +82,19 @@ export default class Game {
         playerBoard.addEventListener("mouseleave", () => {
             this.playerBoardUI.unhighlightCells();
         });
+        playerBoard.addEventListener("mouseout", (e) => {
+            if (
+                !e.target.classList.contains("cell") ||
+                !this.selectedShip ||
+                this.phase !== phases.PLACING_SHIPS
+            )
+                return;
+            
+            const xCoord = parseInt(e.target.dataset.row, 10);
+            const yCoord = parseInt(e.target.dataset.column, 10);
+
+            this.playerBoardUI.resetUnavailableCell(xCoord, yCoord);
+        });
         placeShipsRandomlyBtn.addEventListener(
             "click",
             this.handlePlaceShipsRandomly,

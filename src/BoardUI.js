@@ -34,6 +34,7 @@ export default class BoardUI {
         for (const cell of this.lastHighlightedCells) {
             cell.classList.remove("highlighted");
         }
+        this.lastHighlightedCells = [];
     }
 
 
