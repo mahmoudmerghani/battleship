@@ -5,26 +5,55 @@
 }
 
 :root {
-    --cell-size: 30px;
+    --cell-size: 35px;
+    --primary-color: #1a3c5e;
+    --secondary-color: #2d5f8a;
+    --accent-color: #4a90e2;
+    --hit-color: #ff4444;
+    --miss-color: #7a8b99;
+    --ship-color: #23313e;
+}
+
+body {
+    background: linear-gradient(135deg, #1c2833, #2c3e50);
+    color: white;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    min-height: 100vh;
 }
 
 .game {
-    padding: 1rem;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+#message {
+    text-align: center;
+    font-size: 1.2rem;
 }
 
 .board-container {
     display: flex;
     justify-content: center;
-    gap: 2rem;
-
+    gap: 3rem;
+    flex-wrap: wrap;
+    padding: 2rem 0;
 }
 
 .board {
-    border: 1px solid black;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid var(--accent-color);
+    border-radius: 8px;
     width: fit-content;
     display: grid;
     grid-template-columns: repeat(10, var(--cell-size));
     grid-template-rows: repeat(10, var(--cell-size));
+    box-shadow: 0 0 20px rgba(74, 144, 226, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.board:hover {
+    transform: scale(1.02);
 }
 
 .computer-board {
@@ -32,20 +61,23 @@
 }
 
 .cell {
-    background-color: initial;
-    border: 1px solid black;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--accent-color);
     width: var(--cell-size);
     height: var(--cell-size);
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .cell.ship {
-    background-color: black;
-    border: 1px solid white;
+    background-color: var(--ship-color);
+    border: 1px solid var(--accent-color);
 }
 
 .cell.highlighted, .cell:hover {
-    background-color: green;
+    background-color: rgba(74, 144, 226, 0.5);
+    transform: scale(1.1);
+    z-index: 1;
 }
 
 .cell.unavailable {
@@ -53,34 +85,101 @@
 }
 
 .cell.hit {
-    background-color: red;
+    background-color: var(--hit-color);
+    animation: hitEffect 0.5s ease;
 }
 
 .cell.miss {
-    background-color: grey;
+    background-color: var(--miss-color);
+    animation: missEffect 0.5s ease;
 }
 
-.ships-container.vertical {
+.ships-container {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1.5rem 0;
     display: flex;
-    gap: 10px;
-    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
 }
 
-.ships-container.vertical div.ship {
+.ships-container.vertical .ship-cells {
     flex-direction: column;
 }
 
 .ships-container .cell {
-    background-color: black;
-    border: 1px solid white;
+    background-color: var(--ship-color);
+    border: 1px solid var(--accent-color);
+    margin: 0;
+    border-radius: 2px;
 }
 
 .ships-container .ship {
     display: flex;
-    width: fit-content;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 140px;
+    margin: 0;
+    padding: 2rem;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.ships-container .ship:hover {
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .ships-container .ship.selected {
-    border: 2px solid #00ff00;
-    transform: scale(1.05);
+    background: rgba(76, 175, 80, 0.2);
+    border: 2px solid #4CAF50;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
+}
+
+.ships-container .ship-cells {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+}
+
+button {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+button:hover {
+    background-color: #357abd;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes hitEffect {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+@keyframes missEffect {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
 }
