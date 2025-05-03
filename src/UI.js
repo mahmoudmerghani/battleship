@@ -51,10 +51,14 @@ function createShips(ships) {
     return shipsArray;
 }
 
-function setMessage(msg) {
+function setMessage(msg, append = false) {
     const message = document.getElementById("message");
-
-    message.textContent = msg;
+    if (append) {
+        message.textContent += msg;
+    }
+    else {
+        message.textContent = msg;
+    }
 }
 
 export default {

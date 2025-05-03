@@ -128,7 +128,7 @@ export default class Game {
             if (this.ships.length === 0) {
                 this.phase = phases.PLAYER_TURN;
                 this.setUpComputerBoard();
-                ui.setMessage("Your turn! Attack the enemy board.");
+                ui.setMessage("Attack the enemy board.");
             }
         }
     };
@@ -206,7 +206,7 @@ export default class Game {
 
         this.phase = phases.PLAYER_TURN;
         this.setUpComputerBoard();
-        ui.setMessage("Your turn! Attack the enemy board.");
+        ui.setMessage("Attack the enemy board.");
     };
 
     handlePlayerAttack = (e) => {
@@ -224,7 +224,6 @@ export default class Game {
             this.computerBoardUI.updateCell(x, y, result);
             this.computerBoardUI.markAsUnavailable(x, y);
             this.phase = phases.COMPUTER_TURN;
-            ui.setMessage("Computer is thinking...");
 
             if (result === GameBoard.attackResult.HIT) {
                 const cell = this.computerBoard.getCell(x, y);
@@ -237,12 +236,32 @@ export default class Game {
                 ui.setMessage("Game over, You won!");
                 this.phase = phases.GAME_OVER;
             } else {
-                const delay = Math.floor(Math.random() * 1000) + 1000;
-                setTimeout(() => this.attackPlayer(), delay);
+                this.attackPlayer();
 
             }
         }
     };
+
+    attackPlayer() {
+        if (this.phase !== phases.COMPUTER_TURN) return;
+        
+        const { result, x, y } = this.playerBoard.receiveRandomAttack();
+
+        this.playerBoardUI.updateCell(x, y, result);
+        this.phase = phases.PLAYER_TURN;
+
+        if (result === GameBoard.attackResult.HIT) {
+            const cell = this.playerBoard.getCell(x, y);
+            if (cell.ship.isSunk()) {
+                ui.setMessage(`Your ${cell.ship.name} has been destroyed`);
+            }
+        }
+
+        if (this.playerBoard.allShipsSunk()) {
+            this.phase = phases.GAME_OVER;
+            ui.setMessage("Game over, Computer won");
+        }
+    }
 
     handleReset = (e) => {
         const playerBoard = document.querySelector(".player-board");
@@ -259,26 +278,4 @@ export default class Game {
         this.initializeGameState();
         this.initializeUI();
     };
-
-    attackPlayer() {
-        if (this.phase !== phases.COMPUTER_TURN) return;
-        
-        const { result, x, y } = this.playerBoard.receiveRandomAttack();
-
-        this.playerBoardUI.updateCell(x, y, result);
-        this.phase = phases.PLAYER_TURN;
-        ui.setMessage("Your turn! Attack the enemy board.");
-
-        if (result === GameBoard.attackResult.HIT) {
-            const cell = this.playerBoard.getCell(x, y);
-            if (cell.ship.isSunk()) {
-                ui.setMessage(`Your ${cell.ship.name} has been destroyed`);
-            }
-        }
-
-        if (this.playerBoard.allShipsSunk()) {
-            this.phase = phases.GAME_OVER;
-            ui.setMessage("Game over, Computer won");
-        }
-    }
 }
