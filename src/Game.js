@@ -3,6 +3,13 @@ import Ship from "./Ship";
 import BoardUI from "./BoardUI";
 import ui from "./ui";
 
+const phases = {
+    PLACING_SHIPS: "placing ships",
+    PLAYER_TURN: "player turn",
+    COMPUTER_TURN: "computer turn",
+    GAME_OVER: "game over",
+};
+
 export default class Game {
     static createShips() {
         return [
@@ -25,6 +32,7 @@ export default class Game {
         this.computerBoard = new GameBoard();
         this.playerBoardUI = new BoardUI();
         this.computerBoardUI = new BoardUI();
+        this.phase = phases.PLACING_SHIPS;
         this.ships = Game.createShips();
         this.selectedShip = null;
         this.orientation = GameBoard.HORIZONTAL_ORIENTATION;
@@ -42,6 +50,8 @@ export default class Game {
         });
 
         shipsElements.forEach((el) => shipsContainer.appendChild(el));
+
+        ui.setMessage("Place your ships");
     }
 
     setUpComputerBoard() {
@@ -81,7 +91,12 @@ export default class Game {
     }
 
     handlePlaceShip = (e) => {
-        if (!e.target.classList.contains("cell") || !this.selectedShip) return;
+        if (
+            !e.target.classList.contains("cell") ||
+            !this.selectedShip ||
+            this.phase !== phases.PLACING_SHIPS
+        )
+            return;
 
         const xCoord = parseInt(e.target.dataset.row, 10);
         const yCoord = parseInt(e.target.dataset.column, 10);
@@ -111,14 +126,16 @@ export default class Game {
             this.selectedShip = null;
 
             if (this.ships.length === 0) {
+                this.phase = phases.PLAYER_TURN;
                 this.setUpComputerBoard();
+                ui.setMessage("Your turn! Attack the enemy board.");
             }
         }
     };
 
     handleSelectShip = (e) => {
         const ship = e.target.closest(".ship");
-        if (!ship) return;
+        if (!ship || this.phase !== phases.PLACING_SHIPS) return;
 
         const name = ship.dataset.shipId;
         this.selectedShip = this.ships.find((ship) => ship.name === name);
@@ -127,7 +144,8 @@ export default class Game {
     };
 
     handleRotate = (e) => {
-        if (this.ships.length === 0) return;
+        if (this.ships.length === 0 || this.phase !== phases.PLACING_SHIPS)
+            return;
 
         const shipsContainer = document.querySelector(".ships-container");
 
@@ -143,7 +161,12 @@ export default class Game {
     };
 
     handleHover = (e) => {
-        if (!e.target.classList.contains("cell") || !this.selectedShip) return;
+        if (
+            !e.target.classList.contains("cell") ||
+            !this.selectedShip ||
+            this.phase !== phases.PLACING_SHIPS
+        )
+            return;
 
         const xCoord = parseInt(e.target.dataset.row, 10);
         const yCoord = parseInt(e.target.dataset.column, 10);
@@ -172,7 +195,8 @@ export default class Game {
     };
 
     handlePlaceShipsRandomly = (e) => {
-        if (this.ships.length === 0) return;
+        if (this.ships.length === 0 || this.phase !== phases.PLACING_SHIPS)
+            return;
 
         const cells = this.playerBoard.placeShipsRandomly(this.ships);
         this.ships = [];
@@ -180,11 +204,13 @@ export default class Game {
 
         cells.forEach((cellArr) => this.playerBoardUI.markAsShip(cellArr));
 
+        this.phase = phases.PLAYER_TURN;
         this.setUpComputerBoard();
+        ui.setMessage("Your turn! Attack the enemy board.");
     };
 
     handlePlayerAttack = (e) => {
-        if (!e.target.classList.contains("cell")) return;
+        if (!e.target.classList.contains("cell") || this.phase !== phases.PLAYER_TURN) return;
 
         const x = parseInt(e.target.dataset.row, 10);
         const y = parseInt(e.target.dataset.column, 10);
@@ -197,11 +223,23 @@ export default class Game {
         ) {
             this.computerBoardUI.updateCell(x, y, result);
             this.computerBoardUI.markAsUnavailable(x, y);
+            this.phase = phases.COMPUTER_TURN;
+            ui.setMessage("Computer is thinking...");
+
+            if (result === GameBoard.attackResult.HIT) {
+                const cell = this.computerBoard.getCell(x, y);
+                if (cell.ship.isSunk()) {
+                    ui.setMessage(`Enemy's ${cell.ship.name} has been destroyed`);
+                }
+            }
 
             if (this.computerBoard.allShipsSunk()) {
-                alert("Player won!");
+                ui.setMessage("Game over, You won!");
+                this.phase = phases.GAME_OVER;
             } else {
-                this.attackPlayer();
+                const delay = Math.floor(Math.random() * 1000) + 1000;
+                setTimeout(() => this.attackPlayer(), delay);
+
             }
         }
     };
@@ -216,19 +254,31 @@ export default class Game {
         shipsContainer.innerHTML = "";
 
         computerBoard.style.display = "none";
-        shipsContainer.classList.remove("vertical"); 
+        shipsContainer.classList.remove("vertical");
 
         this.initializeGameState();
         this.initializeUI();
     };
 
     attackPlayer() {
+        if (this.phase !== phases.COMPUTER_TURN) return;
+        
         const { result, x, y } = this.playerBoard.receiveRandomAttack();
 
         this.playerBoardUI.updateCell(x, y, result);
+        this.phase = phases.PLAYER_TURN;
+        ui.setMessage("Your turn! Attack the enemy board.");
+
+        if (result === GameBoard.attackResult.HIT) {
+            const cell = this.playerBoard.getCell(x, y);
+            if (cell.ship.isSunk()) {
+                ui.setMessage(`Your ${cell.ship.name} has been destroyed`);
+            }
+        }
 
         if (this.playerBoard.allShipsSunk()) {
-            alert("Computer won!");
+            this.phase = phases.GAME_OVER;
+            ui.setMessage("Game over, Computer won");
         }
     }
 }
