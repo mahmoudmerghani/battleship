@@ -147,6 +147,34 @@ body {
     justify-content: center;
 }
 
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.difficulty {
+    display: flex;
+    align-items: center;
+}
+
+.difficulty p {
+    font-size: 1.2rem;
+}
+
+.difficulty button {
+    background: rgba(255, 255, 255, 0.05);
+
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
+}
+
+.difficulty button.selected {
+    background-color: #4CAF50;
+}
+
 button {
     background-color: var(--accent-color);
     color: white;

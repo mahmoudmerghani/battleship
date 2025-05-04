@@ -10,6 +10,11 @@ const phases = {
     GAME_OVER: "game over",
 };
 
+const difficulties = {
+    RANDOM: "random",
+    EASY: "easy",
+};
+
 export default class Game {
     static createShips() {
         return [
@@ -36,6 +41,7 @@ export default class Game {
         this.ships = Game.createShips();
         this.selectedShip = null;
         this.orientation = GameBoard.HORIZONTAL_ORIENTATION;
+        this.difficulty = difficulties.EASY;
     }
 
     initializeUI() {
@@ -74,6 +80,7 @@ export default class Game {
         const rotateBtn = document.getElementById("rotate");
         const placeShipsRandomlyBtn = document.getElementById("random");
         const resetBtn = document.getElementById("reset");
+        const difficulty = document.querySelector(".difficulty");
 
         playerBoard.addEventListener("click", this.handlePlaceShip);
         shipsContainer.addEventListener("click", this.handleSelectShip);
@@ -89,7 +96,7 @@ export default class Game {
                 this.phase !== phases.PLACING_SHIPS
             )
                 return;
-            
+
             const xCoord = parseInt(e.target.dataset.row, 10);
             const yCoord = parseInt(e.target.dataset.column, 10);
 
@@ -101,6 +108,8 @@ export default class Game {
         );
         computerBoard.addEventListener("click", this.handlePlayerAttack);
         resetBtn.addEventListener("click", this.handleReset);
+
+        difficulty.addEventListener("click", this.handleChangeDifficulty);
     }
 
     handlePlaceShip = (e) => {
@@ -223,7 +232,11 @@ export default class Game {
     };
 
     handlePlayerAttack = (e) => {
-        if (!e.target.classList.contains("cell") || this.phase !== phases.PLAYER_TURN) return;
+        if (
+            !e.target.classList.contains("cell") ||
+            this.phase !== phases.PLAYER_TURN
+        )
+            return;
 
         const x = parseInt(e.target.dataset.row, 10);
         const y = parseInt(e.target.dataset.column, 10);
@@ -241,7 +254,9 @@ export default class Game {
             if (result === GameBoard.attackResult.HIT) {
                 const cell = this.computerBoard.getCell(x, y);
                 if (cell.ship.isSunk()) {
-                    ui.setMessage(`Enemy's ${cell.ship.name} has been destroyed`);
+                    ui.setMessage(
+                        `Enemy's ${cell.ship.name} has been destroyed`,
+                    );
                 }
             }
 
@@ -250,15 +265,24 @@ export default class Game {
                 this.phase = phases.GAME_OVER;
             } else {
                 this.attackPlayer();
-
             }
         }
     };
 
     attackPlayer() {
         if (this.phase !== phases.COMPUTER_TURN) return;
-        
-        const { result, x, y } = this.playerBoard.receiveSmartAttack();
+
+        let attackMethod;
+        switch (this.difficulty) {
+            case difficulties.EASY:
+                attackMethod = this.playerBoard.receiveSmartAttack;
+                break;
+            case difficulties.RANDOM:
+                attackMethod = this.playerBoard.receiveRandomAttack;
+                break;
+        }
+
+        const { result, x, y } = attackMethod.call(this.playerBoard);
 
         this.playerBoardUI.updateCell(x, y, result);
         this.phase = phases.PLAYER_TURN;
@@ -280,6 +304,7 @@ export default class Game {
         const playerBoard = document.querySelector(".player-board");
         const computerBoard = document.querySelector(".computer-board");
         const shipsContainer = document.querySelector(".ships-container");
+        const easyDifficultyBtn = document.getElementById("easy");
 
         playerBoard.innerHTML = "";
         computerBoard.innerHTML = "";
@@ -287,8 +312,25 @@ export default class Game {
 
         computerBoard.style.display = "none";
         shipsContainer.classList.remove("vertical");
+        ui.selectDifficulty(easyDifficultyBtn);
 
         this.initializeGameState();
         this.initializeUI();
+    };
+
+    handleChangeDifficulty = (e) => {
+        if (
+            e.target.classList.contains("selected") ||
+            this.phase !== phases.PLACING_SHIPS
+        )
+            return;
+
+        const difficulty = e.target.dataset.difficulty;
+
+        if (!difficulty) return;
+
+        this.difficulty = difficulty;
+
+        ui.selectDifficulty(e.target);
     };
 }

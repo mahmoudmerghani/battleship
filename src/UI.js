@@ -61,10 +61,19 @@ function setMessage(msg, append = false) {
     }
 }
 
+function selectDifficulty(button) {
+    const buttons = document.querySelectorAll(".difficulty button");
+
+    buttons.forEach((btn) => btn.classList.remove("selected"));
+
+    button.classList.add("selected");
+}
+
 export default {
     removeShip,
     removeAllShips,
     selectShip,
     createShips,
     setMessage,
+    selectDifficulty,
 };
