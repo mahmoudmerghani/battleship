@@ -47,7 +47,7 @@ describe("GameBoard", () => {
         gameBoard.placeShip(0, 0, ship, GameBoard.HORIZONTAL_ORIENTATION);
         const attacked = gameBoard.receiveAttack(0, 0);
 
-        expect(attacked).toBe(true);
+        expect(attacked).toBe(GameBoard.attackResult.HIT);
         expect(gameBoard.getCell(0, 0).hit).toBe(true);
         expect(ship.numberOfHits).toBe(1);
     });
@@ -55,21 +55,21 @@ describe("GameBoard", () => {
     test("should receive an attack and miss if no ship is present", () => {
         const attacked = gameBoard.receiveAttack(0, 0);
 
-        expect(attacked).toBe(true);
+        expect(attacked).toBe(GameBoard.attackResult.MISS);
         expect(gameBoard.getCell(0, 0).hit).toBe(true);
     });
 
     test("should not receive an attack if out of bounds", () => {
         const attacked = gameBoard.receiveAttack(-1, 0);
 
-        expect(attacked).toBe(false);
+        expect(attacked).toBe(GameBoard.attackResult.OUT_OF_BOUNDS);
     });
 
     test("should not receive an attack if cell is already hit", () => {
         gameBoard.receiveAttack(0, 0);
         const attacked = gameBoard.receiveAttack(0, 0);
 
-        expect(attacked).toBe(false);
+        expect(attacked).toBe(GameBoard.attackResult.ALREADY_HIT);
     });
 
     test("should not place a ship at the edge of the board if its size exceeds the board size", () => {
