@@ -1,1 +1,3 @@
-# webpack-config
+# Battleship
+
+## [Live Preview](https://mahmoudmerghani.github.io/battleship/)
