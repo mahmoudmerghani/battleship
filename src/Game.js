@@ -258,7 +258,7 @@ export default class Game {
     attackPlayer() {
         if (this.phase !== phases.COMPUTER_TURN) return;
         
-        const { result, x, y } = this.playerBoard.receiveRandomAttack();
+        const { result, x, y } = this.playerBoard.receiveSmartAttack();
 
         this.playerBoardUI.updateCell(x, y, result);
         this.phase = phases.PLAYER_TURN;

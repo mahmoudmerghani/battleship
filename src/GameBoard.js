@@ -14,6 +14,7 @@ export default class GameBoard {
     constructor() {
         this.board = this.createBoard();
         this.ships = new Set();
+        this.targetCells = [];
     }
 
     createBoard() {
@@ -141,5 +142,44 @@ export default class GameBoard {
 
     allShipsSunk() {
         return [...this.ships].every((ship) => ship.isSunk());
+    }
+
+    getNeighbors(x, y) {
+        const neighbors = [];
+        const deltas = [
+            [0, 1], [1, 0], [0, -1], [-1, 0] 
+        ];
+
+        for (const [dx, dy] of deltas) {
+            const nx = x + dx;
+            const ny = y + dy;
+
+            if (!this.isOutOfBounds(nx, ny) && !this.getCell(nx, ny).hit) {
+                neighbors.push([nx, ny]);
+            }
+        }
+
+        return neighbors;
+    }
+
+    receiveSmartAttack() {
+        if (this.targetCells.length === 0) {
+            const { result, x, y } = this.receiveRandomAttack();
+
+            if (result === GameBoard.attackResult.HIT) {
+                this.targetCells = this.targetCells.concat(this.getNeighbors(x, y));
+            }
+
+            return { result, x, y };
+        }
+
+        const [x, y] = this.targetCells.shift();
+        const result = this.receiveAttack(x, y);
+
+        if (result === GameBoard.attackResult.HIT) {
+            this.targetCells = this.targetCells.concat(this.getNeighbors(x, y));
+        }
+
+        return { result, x, y };
     }
 }
