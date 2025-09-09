@@ -40,8 +40,12 @@ export default class Game {
         this.phase = phases.PLACING_SHIPS;
         this.ships = Game.createShips();
         this.selectedShip = null;
+        this.selectedShipEl = null;
+        this.shipX = 0;
+        this.shipY = 0;
         this.orientation = GameBoard.HORIZONTAL_ORIENTATION;
         this.difficulty = difficulties.EASY;
+        this.isShipHeld = false;
     }
 
     initializeUI() {
@@ -83,7 +87,7 @@ export default class Game {
         const difficulty = document.querySelector(".difficulty");
 
         playerBoard.addEventListener("click", this.handlePlaceShip);
-        shipsContainer.addEventListener("click", this.handleSelectShip);
+        shipsContainer.addEventListener("mousedown", this.handleSelectShip);
         rotateBtn.addEventListener("click", this.handleRotate);
         playerBoard.addEventListener("mouseover", this.handleHover);
         playerBoard.addEventListener("mouseleave", () => {
@@ -110,10 +114,35 @@ export default class Game {
         resetBtn.addEventListener("click", this.handleReset);
 
         difficulty.addEventListener("click", this.handleChangeDifficulty);
+
+        document.addEventListener("mousemove", (e) => {
+            if (!this.isShipHeld) return;
+
+            const x = e.clientX - this.shipX - 15;
+            const y = e.clientY - this.shipY - 15;
+            this.selectedShipEl.style.transform = `translate(${x}px, ${y}px)`;
+        });
+
+        document.addEventListener("mouseup", (e) => {
+            if (!this.isShipHeld) return;
+            this.isShipHeld = false;
+            this.selectedShipEl.style.transform = "";
+            this.selectedShipEl.style.pointerEvents = "";
+            this.handlePlaceShip(e);
+            document.body.style.cursor = "default";
+        });
+
+        document.addEventListener("dragstart", (event) => {
+            event.preventDefault();
+        });
+        document.addEventListener("dragend", (event) => {
+            event.preventDefault();
+        });
     }
 
     handlePlaceShip = (e) => {
         if (
+            !e.target.closest(".player-board") ||
             !e.target.classList.contains("cell") ||
             !this.selectedShip ||
             this.phase !== phases.PLACING_SHIPS
@@ -161,7 +190,12 @@ export default class Game {
 
         const name = ship.dataset.shipId;
         this.selectedShip = this.ships.find((ship) => ship.name === name);
-
+        this.isShipHeld = true;
+        this.selectedShipEl = ship.querySelector(".ship-cells");
+        this.shipX = this.selectedShipEl.getBoundingClientRect().left;
+        this.shipY = this.selectedShipEl.getBoundingClientRect().top;
+        this.selectedShipEl.style.pointerEvents = "none";
+        document.body.style.cursor = "pointer";
         ui.selectShip(name);
     };
 
