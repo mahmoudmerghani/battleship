@@ -20,6 +20,7 @@ body {
     font-family: 'Segoe UI', Arial, sans-serif;
     min-height: 100vh;
     user-select: none;
+    overflow-x: hidden;
 }
 
 .game {
