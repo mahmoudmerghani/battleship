@@ -295,6 +295,8 @@ export default class Game {
             }
 
             if (this.computerBoard.allShipsSunk()) {
+                ui.setWinner(document.querySelector(".player-board"));
+                ui.setLoser(document.querySelector(".computer-board"));
                 ui.setMessage("Game over, You won!");
                 this.phase = phases.GAME_OVER;
             } else {
@@ -330,6 +332,8 @@ export default class Game {
 
         if (this.playerBoard.allShipsSunk()) {
             this.phase = phases.GAME_OVER;
+            ui.setWinner(document.querySelector(".computer-board"));
+            ui.setLoser(document.querySelector(".player-board"));
             ui.setMessage("Game over, Computer won");
         }
     }
@@ -347,6 +351,8 @@ export default class Game {
         computerBoard.style.display = "none";
         shipsContainer.classList.remove("vertical");
         ui.selectDifficulty(easyDifficultyBtn);
+        ui.resetBoard(playerBoard);
+        ui.resetBoard(computerBoard);
 
         this.initializeGameState();
         this.initializeUI();

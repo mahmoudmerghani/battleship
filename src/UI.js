@@ -69,6 +69,19 @@ function selectDifficulty(button) {
     button.classList.add("selected");
 }
 
+function setWinner(board) {
+    board.classList.add("winner");
+} 
+
+function setLoser(board) {
+    board.classList.add("loser");
+} 
+
+function resetBoard(board) {
+    board.classList.remove("winner");
+    board.classList.remove("loser");
+}
+
 export default {
     removeShip,
     removeAllShips,
@@ -76,4 +89,7 @@ export default {
     createShips,
     setMessage,
     selectDifficulty,
+    setWinner,
+    setLoser,
+    resetBoard
 };
